@@ -1,0 +1,35 @@
+[package]
+name = "mxlink"
+description = "A library for connecting (linking) to the Matrix Client Server API (for building bots, etc.)"
+authors = ["Slavi Pantaleev <slavi@devture.com>"]
+repository = "https://github.com/etkecc/rust-mxlink"
+license = "LGPL-3.0"
+readme = "README.md"
+keywords = ["matrix", "messaging", "ruma"]
+exclude = [".editorconfig", "justfile"]
+version = "1.0.0"
+edition = "2021"
+
+[lib]
+name = "mxlink"
+path = "src/lib.rs"
+
+[dependencies]
+base64 = "0.22.*"
+chacha20poly1305 = "0.10.*"
+hex = "0.4.*"
+js_int = "0.2.*"
+matrix-sdk = { version = "0.7.1", features = ["native-tls", "sqlite", "markdown"] }
+mime = "0.3.*"
+quick_cache = "0.6.*"
+rand = "0.8.*"
+serde = { version = "1.0.*", features = ["derive"], default-features = false }
+serde_json = "1.0.*"
+thiserror = "1.0.*"
+tokio = { version = "1.40.*", features = ["rt", "rt-multi-thread", "macros"] }
+tracing = "0.1.*"
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
