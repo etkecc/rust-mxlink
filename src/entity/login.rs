@@ -3,7 +3,7 @@ pub enum Credentials {
 }
 
 pub struct Encryption {
-    /// The recovery passphrase to use for the recovery module (https://matrix-org.github.io/matrix-rust-sdk/matrix_sdk/encryption/recovery/index.html).
+    /// The recovery passphrase to use for the recovery module (<https://matrix-org.github.io/matrix-rust-sdk/matrix_sdk/encryption/recovery/index.html>).
     /// If this is `None`, the recovery module will not be used.
     pub(crate) recovery_passphrase: Option<String>,
 
