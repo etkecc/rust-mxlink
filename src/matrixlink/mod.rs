@@ -1,10 +1,10 @@
-use std::sync::Arc;
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use tokio::sync::Mutex;
 
-use matrix_sdk::Client;
 use matrix_sdk::ruma::{OwnedRoomId, OwnedUserId};
+use matrix_sdk::Client;
 
 use thiserror::Error;
 

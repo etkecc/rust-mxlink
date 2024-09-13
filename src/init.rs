@@ -128,7 +128,8 @@ pub async fn init(init_config: &InitConfig) -> Result<MatrixLink, InitError> {
                 persistence_manager.session_file_path().to_string_lossy(),
             );
 
-            persistence_manager.purge_database()
+            persistence_manager
+                .purge_database()
                 .map_err(InitError::PurgeDatabase)?;
 
             tracing::info!("The old database has been purged successfully");

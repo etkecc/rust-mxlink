@@ -7,7 +7,8 @@ use matrix_sdk::{
         events::{
             relation::{InReplyTo, Thread},
             room::message::{
-                MessageType, OriginalSyncRoomMessageEvent, Relation, RoomMessageEventContent, Relation::Replacement
+                MessageType, OriginalSyncRoomMessageEvent, Relation, Relation::Replacement,
+                RoomMessageEventContent,
             },
         },
         OwnedEventId,
