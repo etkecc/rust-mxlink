@@ -51,6 +51,9 @@ pub enum InitError {
     #[error("Error restoring existing session: {0}")]
     RestoreSession(RestoreSessionError),
 
+    #[error("Error purging existing database: {0}")]
+    PurgeDatabase(std::io::Error),
+
     #[error("Whoami sanity check failed due to an invalid access token. You may need to delete all persisted data (session and database) and start fresh")]
     WhoAmISanityCheckFailed,
 
@@ -115,6 +118,21 @@ pub async fn init(init_config: &InitConfig) -> Result<MatrixLink, InitError> {
         });
 
         perform_whoami_sanity_check(&client).await?;
+    } else {
+        // No session file. Let's make sure the database directory is empty too, so we can start a new session cleanly.
+
+        if persistence_manager.has_existing_db_state_file() {
+            tracing::warn!(
+                "Found an existing database state file ({}), but no session file ({}). This may happen when a previous initialization attempt failed mid-way or if the session file was deleted subsequently. The only way to recover is to start fresh. Doing that now..",
+                persistence_manager.db_state_file_path().to_string_lossy(),
+                persistence_manager.session_file_path().to_string_lossy(),
+            );
+
+            persistence_manager.purge_database()
+                .map_err(InitError::PurgeDatabase)?;
+
+            tracing::info!("The old database has been purged successfully");
+        }
     }
 
     let client_state = if let Some(client_state) = client_state {

@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use tokio::fs;
 
 use thiserror::Error;
@@ -41,8 +43,41 @@ impl Manager {
         }
     }
 
+    pub(crate) fn session_file_path(&self) -> PathBuf {
+        self.config.session_file_path.clone()
+    }
+
+    pub(crate) fn db_state_file_path(&self) -> PathBuf {
+        self.config.db_dir_path.join("matrix-sdk-state.sqlite3")
+    }
+
     pub(crate) fn has_existing_session(&self) -> bool {
-        self.config.session_file_path.exists()
+        self.session_file_path().exists()
+    }
+
+    pub(crate) fn has_existing_db_state_file(&self) -> bool {
+        self.db_state_file_path().exists()
+    }
+
+    pub(crate) fn purge_database(&self) -> Result<(), std::io::Error> {
+        let base_path = self.config.db_dir_path.clone();
+
+        for entry in std::fs::read_dir(base_path)? {
+            let entry = entry?;
+            let path = entry.path();
+            if !path.is_file() {
+                continue;
+            }
+
+            // Out of precaution, we'll only be deleting *.sqlite3 files
+            if !path.extension().map_or(false, |ext| ext == "sqlite3") {
+                continue;
+            }
+
+            std::fs::remove_file(path)?;
+        }
+
+        Ok(())
     }
 
     pub(crate) async fn read_full_session(&self) -> Result<FullSession, SessionPersistenceError> {
