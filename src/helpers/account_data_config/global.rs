@@ -30,7 +30,7 @@ pub trait GlobalConfigCarrierContent:
 ///
 /// # Examples
 ///
-/// ```no_run
+/// ```rust,ignore
 /// use std::future::Future;
 /// use std::pin::Pin;
 ///
