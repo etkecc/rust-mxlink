@@ -34,7 +34,7 @@ impl Default for Media {
 }
 
 impl Media {
-    pub fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self {}
     }
 

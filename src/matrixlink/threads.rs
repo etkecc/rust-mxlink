@@ -17,7 +17,7 @@ pub struct Threads {
 }
 
 impl Threads {
-    pub fn new(matrix_link: super::MatrixLink) -> Self {
+    pub(super) fn new(matrix_link: super::MatrixLink) -> Self {
         Self { matrix_link }
     }
 

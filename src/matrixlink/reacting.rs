@@ -16,7 +16,7 @@ pub struct Reacting {
 }
 
 impl Reacting {
-    pub fn new(matrix_link: super::MatrixLink) -> Self {
+    pub(super) fn new(matrix_link: super::MatrixLink) -> Self {
         Self { matrix_link }
     }
 

@@ -47,7 +47,7 @@ pub struct MatrixLink {
 }
 
 impl MatrixLink {
-    pub fn new(
+    pub(super) fn new(
         user_id: OwnedUserId,
         client: Client,
         initial_sync_token: Option<String>,
