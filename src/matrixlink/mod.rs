@@ -1,7 +1,10 @@
 use std::sync::Arc;
+use std::collections::HashMap;
 
-use matrix_sdk::ruma::OwnedUserId;
+use tokio::sync::Mutex;
+
 use matrix_sdk::Client;
+use matrix_sdk::ruma::{OwnedRoomId, OwnedUserId};
 
 use thiserror::Error;
 
@@ -30,6 +33,8 @@ struct MatrixLinkInner {
     client: Client,
     initial_sync_token: Option<String>,
     persistence_manager: PersistenceManager,
+
+    typing_notices: Mutex<HashMap<OwnedRoomId, Arc<Mutex<u32>>>>,
 }
 
 /// MatrixLink represents a connection to a Matrix server.
@@ -54,6 +59,7 @@ impl MatrixLink {
                 client,
                 initial_sync_token,
                 persistence_manager,
+                typing_notices: Mutex::new(HashMap::new()),
             }),
         }
     }
