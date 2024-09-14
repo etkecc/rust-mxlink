@@ -25,10 +25,8 @@ impl Drop for TypingNoticeGuard {
         let room = self.room.clone();
         let rooms = self.rooms.clone();
 
-        // Create a tracing span with room_id
         let span = tracing::trace_span!("drop_typing_notice_guard", room_id = %room.room_id());
 
-        // Spawn a new task to handle the asynchronous operations and pass the span
         tokio::spawn(
             async move {
                 tracing::trace!("Doing stop-typing-notice work");

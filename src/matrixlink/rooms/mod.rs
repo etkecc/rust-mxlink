@@ -14,6 +14,8 @@ use tracing::Instrument;
 
 use crate::{CallbackError, InvitationDecision};
 
+pub use typing_notice::TypingNoticeGuard;
+
 const MAX_JOIN_DELAY_SECONDS: u64 = 3600;
 
 #[derive(Error, Debug)]
@@ -60,7 +62,7 @@ impl Rooms {
     ///
     /// When all guard objects for a given room have gone out of scope, the typing notice will be turned off.
     #[tracing::instrument(skip_all, name="start_typing_notice", fields(room_id = room.room_id().as_str()))]
-    pub async fn start_typing_notice(&self, room: &Room) -> typing_notice::TypingNoticeGuard {
+    pub async fn start_typing_notice(&self, room: &Room) -> TypingNoticeGuard {
         typing_notice::start_typing_notice(self.matrix_link.clone(), room).await
     }
 

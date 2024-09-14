@@ -10,7 +10,7 @@ pub use init::{init, InitConfig, InitError, LoginError, RestoreSessionError};
 pub use matrixlink::media::{Media, MediaAttachmentUploadPrepError};
 pub use matrixlink::messaging::Messaging;
 pub use matrixlink::reacting::Reacting;
-pub use matrixlink::rooms::{JoinError, Rooms};
+pub use matrixlink::rooms::{JoinError, Rooms, TypingNoticeGuard};
 pub use matrixlink::syncing::SyncError;
 pub use matrixlink::threads::Threads;
 pub use matrixlink::CallbackError;
