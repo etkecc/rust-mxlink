@@ -12,7 +12,7 @@ pub use matrixlink::messaging::Messaging;
 pub use matrixlink::reacting::Reacting;
 pub use matrixlink::rooms::{JoinError, Rooms, TypingNoticeGuard};
 pub use matrixlink::syncing::SyncError;
-pub use matrixlink::threads::Threads;
+pub use matrixlink::threads::{ThreadGetMessagesParams, Threads};
 pub use matrixlink::CallbackError;
 pub use matrixlink::MatrixLink;
 pub use persistence::SessionPersistenceError;
