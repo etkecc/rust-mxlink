@@ -7,7 +7,7 @@ license = "LGPL-3.0"
 readme = "README.md"
 keywords = ["matrix", "messaging", "sdk", "ruma"]
 exclude = [".editorconfig", "justfile"]
-version = "1.2.1"
+version = "1.3.0"
 edition = "2021"
 
 [lib]
