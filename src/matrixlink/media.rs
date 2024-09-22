@@ -225,7 +225,7 @@ fn inject_info_into_image_content(
     let mut info = ImageInfo::new();
 
     info.mimetype = Some(content_type.as_ref().to_owned());
-    info.size = js_int::UInt::new(size as u64);
+    info.size = matrix_sdk::ruma::UInt::new(size as u64);
 
     content.info(Box::new(info))
 }
@@ -253,7 +253,7 @@ fn inject_info_into_audio_content(
     let mut info = AudioInfo::new();
 
     info.mimetype = Some(content_type.as_ref().to_owned());
-    info.size = js_int::UInt::new(size as u64);
+    info.size = matrix_sdk::ruma::UInt::new(size as u64);
 
     content.info(Box::new(info))
 }
@@ -266,7 +266,7 @@ fn inject_info_into_video_content(
     let mut info = VideoInfo::new();
 
     info.mimetype = Some(content_type.as_ref().to_owned());
-    info.size = js_int::UInt::new(size as u64);
+    info.size = matrix_sdk::ruma::UInt::new(size as u64);
 
     content.info(Box::new(info))
 }
@@ -279,7 +279,7 @@ fn inject_info_into_file_content(
     let mut info = FileInfo::new();
 
     info.mimetype = Some(content_type.as_ref().to_owned());
-    info.size = js_int::UInt::new(size as u64);
+    info.size = matrix_sdk::ruma::UInt::new(size as u64);
 
     content.info(Box::new(info))
 }
