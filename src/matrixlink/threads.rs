@@ -3,8 +3,8 @@ use matrix_sdk::{
     ruma::{
         api::client::relations::get_relating_events_with_rel_type,
         events::{
-            relation::RelationType, AnyMessageLikeEvent, AnySyncMessageLikeEvent,
-            AnySyncTimelineEvent, AnyTimelineEvent, SyncMessageLikeEvent,
+            relation::RelationType, AnySyncMessageLikeEvent, AnySyncTimelineEvent,
+            SyncMessageLikeEvent,
         },
         OwnedEventId,
     },
@@ -53,12 +53,12 @@ impl Threads {
         room: &Room,
         thread_id: OwnedEventId,
         params: ThreadGetMessagesParams,
-    ) -> Result<Vec<AnyMessageLikeEvent>, matrix_sdk::Error> {
-        let mut events: Vec<AnyMessageLikeEvent> = Vec::new();
+    ) -> Result<Vec<AnySyncMessageLikeEvent>, matrix_sdk::Error> {
+        let mut events: Vec<AnySyncMessageLikeEvent> = Vec::new();
 
         tracing::trace!("Fetching thread root event..");
-        let thread_event: TimelineEvent = room.event(&thread_id).await?;
-        if let AnyTimelineEvent::MessageLike(thread_event) = thread_event.event.deserialize()? {
+        let thread_event: TimelineEvent = room.event(&thread_id, None).await?;
+        if let AnySyncTimelineEvent::MessageLike(thread_event) = thread_event.raw().deserialize()? {
             events.push(thread_event);
         }
 
@@ -96,7 +96,7 @@ impl Threads {
 async fn extract_messages_from_http_response(
     room: &Room,
     http_response: get_relating_events_with_rel_type::v1::Response,
-    events: &mut Vec<AnyMessageLikeEvent>,
+    events: &mut Vec<AnySyncMessageLikeEvent>,
 ) -> Result<(), matrix_sdk::Error> {
     for event in http_response.chunk.iter().rev() {
         if let Ok(AnySyncTimelineEvent::MessageLike(AnySyncMessageLikeEvent::RoomEncrypted(
@@ -104,14 +104,14 @@ async fn extract_messages_from_http_response(
         ))) = event.deserialize_as::<AnySyncTimelineEvent>()
         {
             if let Ok(event) = room.decrypt_event(event.cast_ref()).await {
-                if let AnyTimelineEvent::MessageLike(ev) = event.event.deserialize()? {
+                if let AnySyncTimelineEvent::MessageLike(ev) = event.raw().deserialize()? {
                     events.push(ev);
                 }
             } else {
                 tracing::error!("failed-to-decrypt?: {:?}", event);
             }
         } else {
-            events.push(event.deserialize()?);
+            events.push(event.deserialize_as::<AnySyncMessageLikeEvent>()?);
         };
     }
 

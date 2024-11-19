@@ -103,7 +103,7 @@ async fn upload_and_prepare_attachment_message_unencrypted(
 
     let response = client
         .media()
-        .upload(content_type, data)
+        .upload(content_type, data, None)
         .await
         .map_err(MediaAttachmentUploadPrepError::UnencryptedUpload)?;
 
@@ -167,7 +167,7 @@ async fn upload_and_prepare_attachment_message_encrypted(
     let mut cursor = std::io::Cursor::new(data);
 
     let file = client
-        .prepare_encrypted_file(content_type, &mut cursor)
+        .upload_encrypted_file(content_type, &mut cursor)
         .await
         .map_err(MediaAttachmentUploadPrepError::EncryptedUpload)?;
 
