@@ -337,7 +337,8 @@ impl Rooms {
                                 "Determined room members count",
                             );
 
-                            if members.len() == 1 {
+                            if members.len() != 1 {
+                                // It's more than just us, so we shouldn't leave.
                                 return;
                             }
                         }
