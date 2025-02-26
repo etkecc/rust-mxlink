@@ -231,7 +231,7 @@ where
             .map_err(ConfigError::SerializeDeserialize)?;
 
         client
-            .send(request, None)
+            .send(request)
             .await
             .map_err(ConfigError::SdkHttp)?;
 

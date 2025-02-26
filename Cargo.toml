@@ -18,7 +18,7 @@ path = "src/lib.rs"
 base64 = "0.22.*"
 chacha20poly1305 = "0.10.*"
 hex = "0.4.*"
-matrix-sdk = { version = "0.9.0", features = ["native-tls", "sqlite", "markdown"] }
+matrix-sdk = { version = "0.10.0", features = ["native-tls", "sqlite", "markdown"] }
 mime = "0.3.*"
 quick_cache = "0.6.*"
 rand = "0.8.*"

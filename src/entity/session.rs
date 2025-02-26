@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use matrix_sdk::matrix_auth::MatrixSession;
+use matrix_sdk::authentication::matrix::MatrixSession;
 use serde::{Deserialize, Serialize};
 
 /// The data needed to re-build a client.

@@ -80,7 +80,7 @@ impl Threads {
             request.from = from.clone();
             request.limit = Some(params.batch_size.into());
 
-            let http_response = self.matrix_link.client().send(request, None).await?;
+            let http_response = self.matrix_link.client().send(request).await?;
 
             extract_messages_from_http_response(room, http_response.clone(), &mut events).await?;
 
