@@ -175,10 +175,10 @@ async fn login_and_recover(
     db_dir_path: &Path,
     persistence_manager: &PersistenceManager,
 ) -> Result<Client, LoginError> {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     let passphrase: String = (&mut rng)
-        .sample_iter(rand::distributions::Alphanumeric)
+        .sample_iter(rand::distr::Alphanumeric)
         .take(32)
         .map(char::from)
         .collect();
