@@ -70,7 +70,7 @@ impl Manager {
             }
 
             // Out of precaution, we'll only be deleting *.sqlite3 files
-            if !path.extension().map_or(false, |ext| ext == "sqlite3") {
+            if path.extension().is_none_or(|ext| ext != "sqlite3") {
                 continue;
             }
 
