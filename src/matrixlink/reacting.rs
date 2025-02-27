@@ -1,9 +1,9 @@
 use matrix_sdk::{
-    ruma::{
-        events::{reaction::ReactionEventContent, AnySyncMessageLikeEvent, AnySyncTimelineEvent},
-        OwnedEventId,
-    },
     Room,
+    ruma::{
+        OwnedEventId,
+        events::{AnySyncMessageLikeEvent, AnySyncTimelineEvent, reaction::ReactionEventContent},
+    },
 };
 
 use tracing::Instrument;

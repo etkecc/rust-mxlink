@@ -1,4 +1,4 @@
-use matrix_sdk::ruma::{events::receipt::ReceiptThread, OwnedEventId};
+use matrix_sdk::ruma::{OwnedEventId, events::receipt::ReceiptThread};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Info {

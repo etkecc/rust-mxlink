@@ -5,8 +5,8 @@ use matrix_sdk::ruma::api::client::config::set_global_account_data;
 use matrix_sdk::ruma::events::{GlobalAccountDataEventContent, StaticEventContent};
 
 use super::ConfigError;
-use crate::helpers::encryption::Manager as EncryptionManager;
 use crate::MatrixLink;
+use crate::helpers::encryption::Manager as EncryptionManager;
 
 /// A trait that your global configuration should implement.
 pub trait GlobalConfig: Clone + serde::Serialize + serde::de::DeserializeOwned {}
@@ -169,7 +169,9 @@ where
                         tracing::trace!("Reusing existing global config");
                         global_config
                     } else {
-                        tracing::warn!("Found existing global config, but failed decrypting/parsing it.. Making new..");
+                        tracing::warn!(
+                            "Found existing global config, but failed decrypting/parsing it.. Making new.."
+                        );
                         self.do_create_new_without_locking().await?
                     }
                 }
@@ -230,10 +232,7 @@ where
         let request = set_global_account_data::v3::Request::new(user_id, &encrypted_config)
             .map_err(ConfigError::SerializeDeserialize)?;
 
-        client
-            .send(request)
-            .await
-            .map_err(ConfigError::SdkHttp)?;
+        client.send(request).await.map_err(ConfigError::SdkHttp)?;
 
         Ok(())
     }

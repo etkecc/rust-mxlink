@@ -1,12 +1,12 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use matrix_sdk::{config::SyncSettings, ruma::api::client::filter::FilterDefinition, LoopCtrl};
+use matrix_sdk::{LoopCtrl, config::SyncSettings, ruma::api::client::filter::FilterDefinition};
 
 use thiserror::Error;
 
-use crate::utils::is_potentially_transient_sdk_error;
 use crate::SessionPersistenceError;
+use crate::utils::is_potentially_transient_sdk_error;
 
 const SYNC_INITIAL_DELAY_DURATION: Duration = Duration::from_secs(3);
 const SYNC_MAX_DELAY_DURATION: Duration = Duration::from_secs(30);

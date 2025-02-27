@@ -1,14 +1,14 @@
 use matrix_sdk::{
+    Room,
     deserialized_responses::TimelineEvent,
     ruma::{
+        OwnedEventId,
         api::client::relations::get_relating_events_with_rel_type,
         events::{
-            relation::RelationType, AnySyncMessageLikeEvent, AnySyncTimelineEvent,
-            SyncMessageLikeEvent,
+            AnySyncMessageLikeEvent, AnySyncTimelineEvent, SyncMessageLikeEvent,
+            relation::RelationType,
         },
-        OwnedEventId,
     },
-    Room,
 };
 
 const FETCH_BATCH_SIZE: u32 = 1000;

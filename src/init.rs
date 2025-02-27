@@ -1,8 +1,8 @@
 use std::path::Path;
 
 use matrix_sdk::encryption::{
-    recovery::RecoveryError as MatrixRecoveryError, secret_storage::SecretStorageError,
-    EncryptionSettings,
+    EncryptionSettings, recovery::RecoveryError as MatrixRecoveryError,
+    secret_storage::SecretStorageError,
 };
 use matrix_sdk::{Client, ClientBuildError};
 
@@ -10,11 +10,11 @@ use thiserror::Error;
 
 use rand::Rng;
 
+use crate::SessionPersistenceError;
 use crate::entity::session::{ClientSession, FullSession};
 use crate::matrixlink::MatrixLink;
 use crate::persistence::Manager as PersistenceManager;
 use crate::utils::is_potentially_transient_http_error;
-use crate::SessionPersistenceError;
 use crate::{LoginConfig, LoginCredentials, PersistenceConfig};
 
 pub struct InitConfig {
@@ -54,7 +54,9 @@ pub enum InitError {
     #[error("Error purging existing database: {0}")]
     PurgeDatabase(std::io::Error),
 
-    #[error("Whoami sanity check failed due to an invalid access token. You may need to delete all persisted data (session and database) and start fresh")]
+    #[error(
+        "Whoami sanity check failed due to an invalid access token. You may need to delete all persisted data (session and database) and start fresh"
+    )]
     WhoAmISanityCheckFailed,
 
     #[error("Session_meta information in the client is missing")]
@@ -268,7 +270,10 @@ async fn perform_whoami_sanity_check(client: &Client) -> Result<(), InitError> {
                     return Err(InitError::WhoAmISanityCheckFailed);
                 }
 
-                tracing::warn!(?delay, "Whoami sanity check with a potentially-transient error.. Retrying after a delay..");
+                tracing::warn!(
+                    ?delay,
+                    "Whoami sanity check with a potentially-transient error.. Retrying after a delay.."
+                );
 
                 sleep(delay).await;
 
@@ -302,7 +307,9 @@ async fn recover(
     if let MatrixRecoveryError::SecretStorage(secret_storage_err) = err {
         match secret_storage_err {
             SecretStorageError::MissingKeyInfo { key_id: _ } => {
-                tracing::warn!("Missing recovery information (this may be a first login with recovery enabled). Creating a new recovery key");
+                tracing::warn!(
+                    "Missing recovery information (this may be a first login with recovery enabled). Creating a new recovery key"
+                );
 
                 // We don't need this recovery key. We're using the passphrase to recover.
                 let _recovery_key = recovery

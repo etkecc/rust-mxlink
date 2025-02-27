@@ -4,9 +4,9 @@ use tokio::fs;
 
 use thiserror::Error;
 
+use crate::PersistenceConfig;
 use crate::entity::session::FullSession;
 use crate::helpers::encryption::Manager as EncryptionManager;
-use crate::PersistenceConfig;
 
 #[derive(Error, Debug)]
 pub enum SessionPersistenceError {

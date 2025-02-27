@@ -3,7 +3,9 @@ use std::borrow::Borrow;
 use tracing::Instrument;
 
 use matrix_sdk::{
+    Room, RoomState,
     ruma::{
+        OwnedEventId,
         events::{
             relation::{InReplyTo, Thread},
             room::message::{
@@ -11,9 +13,7 @@ use matrix_sdk::{
                 RoomMessageEventContent,
             },
         },
-        OwnedEventId,
     },
-    Room, RoomState,
 };
 
 use matrix_sdk::ruma::api::client::message::send_message_event;

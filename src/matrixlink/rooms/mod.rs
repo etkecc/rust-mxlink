@@ -1,11 +1,11 @@
 mod typing_notice;
 
 use matrix_sdk::{
-    ruma::events::{
-        room::member::{MembershipState, StrippedRoomMemberEvent},
-        AnySyncStateEvent, AnySyncTimelineEvent,
-    },
     Room, RoomMemberships, RoomState,
+    ruma::events::{
+        AnySyncStateEvent, AnySyncTimelineEvent,
+        room::member::{MembershipState, StrippedRoomMemberEvent},
+    },
 };
 
 use thiserror::Error;

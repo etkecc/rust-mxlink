@@ -1,12 +1,12 @@
 use std::future::Future;
 use std::pin::Pin;
 
+use matrix_sdk::Room;
+use matrix_sdk::ruma::OwnedUserId;
 use matrix_sdk::ruma::api::client::config::set_room_account_data;
 use matrix_sdk::ruma::events::{
     RoomAccountDataEvent, RoomAccountDataEventContent, StaticEventContent,
 };
-use matrix_sdk::ruma::OwnedUserId;
-use matrix_sdk::Room;
 
 use quick_cache::sync::Cache;
 
@@ -230,7 +230,9 @@ where
                             tracing::trace!("Reusing existing room config");
                             room_config
                         } else {
-                            tracing::warn!("Found existing room config, but failed decrypting/parsing it.. Making new..");
+                            tracing::warn!(
+                                "Found existing room config, but failed decrypting/parsing it.. Making new.."
+                            );
                             self.do_create_new_for_room_without_locking(room).await?
                         }
                     }

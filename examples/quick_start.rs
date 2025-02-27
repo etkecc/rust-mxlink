@@ -1,6 +1,8 @@
 use mxlink::helpers::encryption::EncryptionKey;
+use mxlink::{
+    InitConfig, LoginConfig, LoginCredentials, LoginEncryption, MatrixLink, PersistenceConfig,
+};
 use mxlink::{InvitationDecision, MessageResponseType};
-use mxlink::{InitConfig, LoginConfig, LoginCredentials, LoginEncryption, MatrixLink, PersistenceConfig};
 
 // You can run this example either by modifying the configuration below,
 // or against the Synapse server provided by baibot (https://github.com/etkecc/baibot/) - see its docs/development.md guide.

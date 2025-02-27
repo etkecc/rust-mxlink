@@ -1,13 +1,13 @@
 use matrix_sdk::{
+    Room,
     ruma::events::room::{
+        ImageInfo,
         message::{
             AudioInfo, AudioMessageEventContent, FileInfo, FileMessageEventContent,
             ImageMessageEventContent, MessageType, RoomMessageEventContent,
             UnstableVoiceContentBlock, VideoInfo, VideoMessageEventContent,
         },
-        ImageInfo,
     },
-    Room,
 };
 
 use thiserror::Error;

@@ -3,13 +3,13 @@ use std::sync::Arc;
 
 use tokio::sync::Mutex;
 
-use matrix_sdk::ruma::{OwnedRoomId, OwnedUserId};
 use matrix_sdk::Client;
+use matrix_sdk::ruma::{OwnedRoomId, OwnedUserId};
 
 use thiserror::Error;
 
-use crate::persistence::Manager as PersistenceManager;
 use crate::SyncError;
+use crate::persistence::Manager as PersistenceManager;
 
 pub(crate) mod media;
 pub(crate) mod messaging;
