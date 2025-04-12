@@ -68,9 +68,10 @@ pub async fn upload_and_prepare_attachment_message(
     attachment_body: String,
 ) -> Result<MessageType, MediaAttachmentUploadPrepError> {
     let is_encrypted = room
-        .is_encrypted()
+        .latest_encryption_state()
         .await
-        .map_err(MediaAttachmentUploadPrepError::EncryptionStatusUnknown)?;
+        .map_err(MediaAttachmentUploadPrepError::EncryptionStatusUnknown)?
+        .is_encrypted();
 
     if is_encrypted {
         upload_and_prepare_attachment_message_encrypted(
