@@ -103,7 +103,7 @@ async fn extract_messages_from_http_response(
             SyncMessageLikeEvent::Original(_),
         ))) = event.deserialize_as::<AnySyncTimelineEvent>()
         {
-            if let Ok(event) = room.decrypt_event(event.cast_ref()).await {
+            if let Ok(event) = room.decrypt_event(event.cast_ref(), None).await {
                 if let AnySyncTimelineEvent::MessageLike(ev) = event.raw().deserialize()? {
                     events.push(ev);
                 }

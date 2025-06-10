@@ -18,7 +18,7 @@ pub enum MediaAttachmentUploadPrepError {
     EncryptionStatusUnknown(matrix_sdk::Error),
 
     #[error("Error during unencrypted upload: {0}")]
-    UnencryptedUpload(matrix_sdk::HttpError),
+    UnencryptedUpload(matrix_sdk::Error),
 
     #[error("Error during encrypted upload: {0}")]
     EncryptedUpload(matrix_sdk::Error),
@@ -168,7 +168,7 @@ async fn upload_and_prepare_attachment_message_encrypted(
     let mut cursor = std::io::Cursor::new(data);
 
     let file = client
-        .upload_encrypted_file(content_type, &mut cursor)
+        .upload_encrypted_file(&mut cursor)
         .await
         .map_err(MediaAttachmentUploadPrepError::EncryptedUpload)?;
 
