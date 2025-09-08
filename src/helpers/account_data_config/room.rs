@@ -2,6 +2,7 @@ use std::future::Future;
 use std::pin::Pin;
 
 use matrix_sdk::Room;
+use matrix_sdk::ruma;
 use matrix_sdk::ruma::OwnedUserId;
 use matrix_sdk::ruma::api::client::config::set_room_account_data;
 use matrix_sdk::ruma::events::{
@@ -18,7 +19,9 @@ pub trait RoomConfig: Clone + serde::Serialize + serde::de::DeserializeOwned {}
 
 /// A trait that your room configuration "carrier content" struct should implement.
 pub trait RoomConfigCarrierContent:
-    StaticEventContent + RoomAccountDataEventContent + serde::de::DeserializeOwned
+    StaticEventContent<IsPrefix = ruma::events::False>
+    + RoomAccountDataEventContent
+    + serde::de::DeserializeOwned
 {
     fn new(payload: String) -> Self;
 

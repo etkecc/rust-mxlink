@@ -1,6 +1,7 @@
 use std::future::Future;
 use std::pin::Pin;
 
+use matrix_sdk::ruma;
 use matrix_sdk::ruma::api::client::config::set_global_account_data;
 use matrix_sdk::ruma::events::{GlobalAccountDataEventContent, StaticEventContent};
 
@@ -13,7 +14,9 @@ pub trait GlobalConfig: Clone + serde::Serialize + serde::de::DeserializeOwned {
 
 /// A trait that your room configuration "carrier content" struct should implement.
 pub trait GlobalConfigCarrierContent:
-    StaticEventContent + GlobalAccountDataEventContent + serde::de::DeserializeOwned
+    StaticEventContent<IsPrefix = ruma::events::False>
+    + GlobalAccountDataEventContent
+    + serde::de::DeserializeOwned
 {
     fn new(payload: String) -> Self;
 
