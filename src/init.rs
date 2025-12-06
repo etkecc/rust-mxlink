@@ -324,9 +324,7 @@ async fn recover(
                 return Ok(());
             }
             // This happens when the `recovery_passphrase` is wrong.
-            SecretStorageError::SecretStorageKey(
-                matrix_sdk::crypto::secret_storage::DecodeError::Mac(err),
-            ) => {
+            SecretStorageError::SecretStorageKey(err) => {
                 tracing::error!(
                     "Failed to validate secret storage key (perhaps the key changed): {:?}",
                     err
