@@ -110,6 +110,7 @@ pub struct Manager<ConfigType, ConfigCarrierContentType> {
     user_id: OwnedUserId,
     encryption_manager: EncryptionManager,
 
+    #[allow(clippy::type_complexity)]
     initial_room_config_callback:
         Box<dyn Fn(Room) -> Pin<Box<dyn Future<Output = ConfigType> + Send>> + Send + Sync>,
 

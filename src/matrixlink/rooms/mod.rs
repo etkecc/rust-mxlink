@@ -85,10 +85,10 @@ impl Rooms {
             tokio::time::sleep(std::time::Duration::from_secs(delay)).await;
             delay *= 2;
 
-            if let Some(max_delay_seconds) = max_delay_seconds {
-                if delay > max_delay_seconds {
-                    return Err(JoinError::BackOffTooLarge(delay));
-                }
+            if let Some(max_delay_seconds) = max_delay_seconds
+                && delay > max_delay_seconds
+            {
+                return Err(JoinError::BackOffTooLarge(delay));
             }
         }
 

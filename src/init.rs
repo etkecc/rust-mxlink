@@ -210,16 +210,16 @@ async fn login_and_recover(
         }
     }
 
-    if let Some(encryption_config) = &login_config.encryption {
-        if let Some(recovery_passphrase) = &encryption_config.recovery_passphrase {
-            recover(
-                &client,
-                recovery_passphrase,
-                encryption_config.recovery_reset_allowed,
-            )
-            .await
-            .map_err(LoginError::Recovery)?;
-        }
+    if let Some(encryption_config) = &login_config.encryption
+        && let Some(recovery_passphrase) = &encryption_config.recovery_passphrase
+    {
+        recover(
+            &client,
+            recovery_passphrase,
+            encryption_config.recovery_reset_allowed,
+        )
+        .await
+        .map_err(LoginError::Recovery)?;
     }
 
     let user_session = matrix_auth
