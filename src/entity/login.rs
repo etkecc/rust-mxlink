@@ -1,5 +1,12 @@
+use matrix_sdk::ruma::{OwnedDeviceId, OwnedUserId};
+
 pub enum Credentials {
     UserPassword(String, String),
+    AccessToken {
+        user_id: OwnedUserId,
+        device_id: OwnedDeviceId,
+        access_token: String,
+    },
 }
 
 pub struct Encryption {
