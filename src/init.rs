@@ -208,6 +208,33 @@ async fn login_and_recover(
                 }
             }
         }
+        LoginCredentials::AccessToken {
+            user_id,
+            device_id,
+            access_token,
+        } => {
+            use matrix_sdk::SessionMeta;
+            use matrix_sdk::SessionTokens;
+            use matrix_sdk::authentication::matrix::MatrixSession;
+
+            let session = MatrixSession {
+                meta: SessionMeta {
+                    user_id: user_id.clone(),
+                    device_id: device_id.clone(),
+                },
+                tokens: SessionTokens {
+                    access_token: access_token.clone(),
+                    refresh_token: None,
+                },
+            };
+
+            client
+                .restore_session(session)
+                .await
+                .map_err(LoginError::Auth)?;
+
+            tracing::info!("Authenticated via access token for {user_id}");
+        }
     }
 
     if let Some(encryption_config) = &login_config.encryption
