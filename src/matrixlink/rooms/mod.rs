@@ -4,7 +4,7 @@ use matrix_sdk::{
     Room, RoomMemberships, RoomState,
     ruma::events::{
         AnySyncStateEvent, AnySyncTimelineEvent,
-        room::member::{MembershipState, StrippedRoomMemberEvent},
+        room::member::{MembershipState, StrippedRoomMemberEvent, SyncRoomMemberEvent},
     },
 };
 
@@ -184,6 +184,10 @@ impl Rooms {
     }
 
     /// Register a callback to be called when a room has been joined.
+    ///
+    /// This listens for `SyncRoomMemberEvent` directly (rather than `AnySyncTimelineEvent`),
+    /// so it catches the bot's own join membership event regardless of whether the homeserver
+    /// places it in the sync response's `timeline` or `state` section.
     pub fn on_joined<F, Fut>(&self, callback: F)
     where
         F: FnOnce(AnySyncTimelineEvent, Room) -> Fut + Send + 'static + Clone + Sync,
@@ -192,31 +196,21 @@ impl Rooms {
         let own_user_id = self.matrix_link.user_id().to_owned();
 
         self.matrix_link.client().add_event_handler(
-            move |ev: AnySyncTimelineEvent, room: Room| async move {
+            move |membership: SyncRoomMemberEvent, room: Room| async move {
                 let event_span = tracing::error_span!(
                     "on_joined",
-                    event_id = ev.event_id().as_str(),
+                    event_id = membership.event_id().as_str(),
                     room_id = room.room_id().as_str(),
-                    sender_id = ev.sender().as_str()
+                    sender_id = membership.sender().as_str()
                 );
 
                 {
                     let _enter = event_span.enter();
 
                     tracing::trace!(
-                        "Sync timeline event handler (on_joined_room) for event: {:?}",
-                        ev
-                    );
-
-                    let membership = if let AnySyncTimelineEvent::State(
-                        AnySyncStateEvent::RoomMember(membership),
-                    ) = ev.clone()
-                    {
+                        "Membership state event handler (on_joined) for event: {:?}",
                         membership
-                    } else {
-                        tracing::trace!("Ignoring non-state/non-membership event");
-                        return;
-                    };
+                    );
 
                     match membership.membership() {
                         MembershipState::Join => {}
@@ -233,7 +227,6 @@ impl Rooms {
                         );
                         return;
                     }
-
 
                     // We wish to ignore events that are a result of the bot's display name changing.
                     // When that happens, the event's content still looks like a join event:
@@ -252,17 +245,21 @@ impl Rooms {
                         return;
                     };
 
-                    let Some(unsigned) = original.prev_content() else {
-                        tracing::debug!("Ignoring join event without prev_content");
-                        return;
-                    };
-
-                    if let MembershipState::Join = unsigned.membership {
-                        tracing::debug!("Ignoring join event that supersedes another join event (likely a displayname/avatar change, etc.)");
-                        return;
-                    };
+                    if let Some(prev_content) = original.prev_content() {
+                        if let MembershipState::Join = prev_content.membership {
+                            tracing::debug!("Ignoring join event that supersedes another join event (likely a displayname/avatar change, etc.)");
+                            return;
+                        }
+                    } else {
+                        // No prev_content means this is a genuine first-time join
+                        // (no previous membership state exists).
+                        // Some homeservers (e.g. Continuwuity) may omit prev_content entirely.
+                        tracing::debug!("No prev_content found - treating as a genuine join");
+                    }
                 }
 
+                // Wrap the membership event into AnySyncTimelineEvent for the callback
+                let ev = AnySyncTimelineEvent::State(AnySyncStateEvent::RoomMember(membership));
                 if let Err(err) = callback(ev, room).instrument(event_span).await {
                     tracing::error!(?err, "Error in callback");
                 }
