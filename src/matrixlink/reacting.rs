@@ -37,7 +37,7 @@ impl Reacting {
                 reaction_key.to_owned(),
             ));
 
-        room.send(content.clone()).await
+        room.send(content.clone()).await.map(|r| r.response)
     }
 
     /// Register a callback to be called when a reaction is received in any room and it seems like one that we should handle.

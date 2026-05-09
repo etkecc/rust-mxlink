@@ -7,7 +7,7 @@ use matrix_sdk::{
     ruma::{
         OwnedEventId,
         events::{
-            relation::{InReplyTo, Thread},
+            relation::{Reply, Thread},
             room::message::{
                 MessageType, OriginalSyncRoomMessageEvent, Relation, Relation::Replacement,
                 RoomMessageEventContent,
@@ -67,9 +67,7 @@ impl Messaging {
         match response_type {
             MessageResponseType::InRoom => {}
             MessageResponseType::Reply(event_id) => {
-                content.relates_to = Some(Relation::Reply {
-                    in_reply_to: InReplyTo::new(event_id),
-                })
+                content.relates_to = Some(Relation::Reply(Reply::with_event_id(event_id)))
             }
             MessageResponseType::InThread(thread_info) => {
                 content.relates_to = Some(Relation::Thread(Thread::plain(
@@ -85,7 +83,7 @@ impl Messaging {
 
         tracing::debug!(?duration, "Event sent",);
 
-        result
+        result.map(|r| r.response)
     }
 
     pub async fn redact_event(
