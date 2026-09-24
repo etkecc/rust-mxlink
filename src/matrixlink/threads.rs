@@ -62,7 +62,7 @@ impl Threads {
             events.push(thread_event);
         }
 
-        let mut from: Option<String> = Some(String::new());
+        let mut from: Option<String> = None;
 
         while from.is_some() {
             tracing::trace!(
@@ -84,7 +84,7 @@ impl Threads {
 
             extract_messages_from_http_response(room, http_response.clone(), &mut events).await?;
 
-            from = http_response.next_batch.clone();
+            from = http_response.next_batch.filter(|token| !token.is_empty());
         }
 
         events.sort_by_key(|event| event.origin_server_ts());
