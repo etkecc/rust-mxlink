@@ -62,9 +62,12 @@ impl Threads {
             events.push(thread_event);
         }
 
-        let mut from: Option<String> = Some(String::new());
+        // The first request must omit `from` entirely.
+        // Some servers (e.g. Continuwuity) reject an empty `from` token.
+        // Ref: https://github.com/etkecc/baibot/issues/265 and https://github.com/etkecc/rust-mxlink/pull/4
+        let mut from: Option<String> = None;
 
-        while from.is_some() {
+        loop {
             tracing::trace!(
                 ?from,
                 batch_size = params.batch_size,
@@ -84,7 +87,10 @@ impl Threads {
 
             extract_messages_from_http_response(room, http_response.clone(), &mut events).await?;
 
-            from = http_response.next_batch.clone();
+            from = http_response.next_batch.filter(|token| !token.is_empty());
+            if from.is_none() {
+                break;
+            }
         }
 
         events.sort_by_key(|event| event.origin_server_ts());
