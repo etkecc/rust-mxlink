@@ -258,7 +258,14 @@ where
     pub async fn create_new_for_room(&self, room: &Room) -> Result<ConfigType, ConfigError> {
         let _lock = self.lock.lock().await;
 
-        self.do_create_new_for_room_without_locking(room).await
+        let config = self.do_create_new_for_room_without_locking(room).await?;
+
+        // Replace any previously cached config for this room, so that it does not outlive the new one.
+        if let Some(lru_cache) = &self.lru_cache {
+            let _ = lru_cache.replace(room.room_id().as_str().to_owned(), config.clone(), false);
+        }
+
+        Ok(config)
     }
 
     async fn do_create_new_for_room_without_locking(
