@@ -1,4 +1,7 @@
+mod recent_event_ids;
 mod typing_notice;
+
+use std::sync::Arc;
 
 use matrix_sdk::{
     Room, RoomMemberships, RoomState,
@@ -16,7 +19,12 @@ use crate::{CallbackError, InvitationDecision};
 
 pub use typing_notice::TypingNoticeGuard;
 
+use recent_event_ids::RecentEventIds;
+
 const MAX_JOIN_DELAY_SECONDS: u64 = 3600;
+
+/// How many handled join event IDs `on_joined` remembers, to skip repeat deliveries of the same event.
+const ON_JOINED_RECENT_EVENT_IDS_CAPACITY: usize = 100;
 
 #[derive(Error, Debug)]
 pub enum JoinError {
@@ -188,12 +196,16 @@ impl Rooms {
     /// This listens for `SyncRoomMemberEvent` directly (rather than `AnySyncTimelineEvent`),
     /// so it catches the bot's own join membership event regardless of whether the homeserver
     /// places it in the sync response's `timeline` or `state` section.
+    ///
+    /// The same join event may be delivered in both sections of a sync response (e.g. with `state_after`),
+    /// so the callback is called only once per join event.
     pub fn on_joined<F, Fut>(&self, callback: F)
     where
         F: FnOnce(AnySyncTimelineEvent, Room) -> Fut + Send + 'static + Clone + Sync,
         Fut: std::future::Future<Output = Result<(), CallbackError>> + Send + 'static,
     {
         let own_user_id = self.matrix_link.user_id().to_owned();
+        let handled_event_ids = Arc::new(RecentEventIds::new(ON_JOINED_RECENT_EVENT_IDS_CAPACITY));
 
         self.matrix_link.client().add_event_handler(
             move |membership: SyncRoomMemberEvent, room: Room| async move {
@@ -255,6 +267,11 @@ impl Rooms {
                         // (no previous membership state exists).
                         // Some homeservers (e.g. Continuwuity) may omit prev_content entirely.
                         tracing::debug!("No prev_content found - treating as a genuine join");
+                    }
+
+                    if !handled_event_ids.insert(membership.event_id()) {
+                        tracing::debug!("Ignoring already handled join event (delivered more than once)");
+                        return;
                     }
                 }
 
