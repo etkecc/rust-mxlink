@@ -2,7 +2,7 @@ use base64::{Engine as _, engine::general_purpose::STANDARD};
 
 use chacha20poly1305::{
     ChaCha20Poly1305, Key, Nonce,
-    aead::{Aead, AeadCore, KeyInit, OsRng},
+    aead::{Aead, Generate, KeyInit},
 };
 
 #[derive(Debug, Clone)]
@@ -48,10 +48,9 @@ impl Manager {
     }
 
     fn do_encrypt_string(&self, plaintext: &str, key: &EncryptionKey) -> Result<String, String> {
-        let key = Key::from_slice(&key.0);
-        let cipher = ChaCha20Poly1305::new(key);
+        let cipher = ChaCha20Poly1305::new(&Key::from(key.0));
 
-        let nonce = ChaCha20Poly1305::generate_nonce(&mut OsRng); // 12-bytes
+        let nonce = Nonce::generate(); // 12-bytes
 
         let ciphertext = cipher
             .encrypt(&nonce, plaintext.as_bytes())
@@ -80,16 +79,13 @@ impl Manager {
             return Err("Invalid base64".into());
         };
 
-        if decoded.len() < 12 {
+        let Some((nonce, ciphertext)) = decoded.split_first_chunk::<12>() else {
             return Err("Decoded data too short".into());
-        }
+        };
 
-        let (nonce, ciphertext) = decoded.split_at(12);
+        let cipher = ChaCha20Poly1305::new(&Key::from(key.0));
 
-        let key = Key::from_slice(&key.0);
-        let cipher = ChaCha20Poly1305::new(key);
-
-        let plaintext = cipher.decrypt(Nonce::from_slice(nonce), ciphertext);
+        let plaintext = cipher.decrypt(&Nonce::from(*nonce), ciphertext);
 
         match plaintext {
             Ok(plaintext) => Ok(String::from_utf8(plaintext)
@@ -129,6 +125,21 @@ mod tests {
 
         let decryption_result_from_another = manager_another.decrypt_string(&encrypted);
         assert!(decryption_result_from_another.is_err());
+    }
+
+    /// Data encrypted by earlier versions (chacha20poly1305 0.10) has to remain readable.
+    #[test]
+    fn test_decryption_of_previously_encrypted_data() {
+        let manager = Manager::new(Some(
+            EncryptionKey::from_hex_str(
+                "45e576aee2b639e73bd1a856f1a134cbb5810babed37e72143f7e7cec744cd5c",
+            )
+            .unwrap(),
+        ));
+
+        let encrypted = "gKbGfOgZMM/p5EQ+TgylOdrYt2dLqV16vmlM/WEvJRCRZBq6Uo+npZU=";
+
+        assert_eq!("Hello, world!", manager.decrypt_string(encrypted).unwrap());
     }
 
     #[test]
