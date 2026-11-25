@@ -415,6 +415,9 @@ async fn build_client(
             auto_enable_backups: true,
             backup_download_strategy: matrix_sdk::encryption::BackupDownloadStrategy::OneShot,
         })
+        // We don't use the event cache. If enabled, it would store all synced events in the database
+        // and fail syncing (before event handlers run) whenever it runs into an error.
+        .with_event_cache(false)
         .build()
         .await
 }
